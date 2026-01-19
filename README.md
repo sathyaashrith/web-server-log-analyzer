@@ -75,4 +75,6 @@ This project solves all these problems.
 
 <img width="1919" height="945" alt="Screenshot 2026-01-19 151110" src="https://github.com/user-attachments/assets/b2eb2f95-d6fd-4896-9453-0c6720262c3b" />
 <img width="1910" height="837" alt="Screenshot 2026-01-19 151012" src="https://github.com/user-attachments/assets/6190e139-86df-4773-894f-a07675cc32f4" />
+<img width="1919" height="823" alt="Screenshot 2026-01-19 151023" src="https://github.com/user-attachments/assets/b845839f-6c9d-486f-bc6f-32f917f21669" />
+<img width="1919" height="935" alt="Screenshot 2026-01-19 151053" src="https://github.com/user-attachments/assets/f83552ee-3c16-430e-90d3-b02eb04363ce" />
 
