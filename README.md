@@ -72,7 +72,6 @@ This project solves all these problems.
 
 ---
 
-## 📝 Log Format Supported
+<img width="1919" height="945" alt="Screenshot 2026-01-19 151110" src="https://github.com/user-attachments/assets/b2eb2f95-d6fd-4896-9453-0c6720262c3b" />
 
-Example log line (Apache/Nginx style):
 
