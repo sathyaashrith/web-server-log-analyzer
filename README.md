@@ -1,3 +1,4 @@
+<img width="1910" height="837" alt="Screenshot 2026-01-19 151012" src="https://github.com/user-attachments/assets/6190e139-86df-4773-894f-a07675cc32f4" />
 # 📊 Web Server Log Analyzer (CLI + Flask Dashboard)
 
 A professional **Web Server Log Analyzer** built using **Python** that can analyze large server log files efficiently, handle corrupted/malformed logs safely, generate reports, and display results in a **Flask-based interactive dashboard with charts**.
