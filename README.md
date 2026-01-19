@@ -1,14 +1,78 @@
-# Web Server Log Analyzer
+# 📊 Web Server Log Analyzer (CLI + Flask Dashboard)
 
-## Overview
-This project analyzes web server log files and generates reports.
+A professional **Web Server Log Analyzer** built using **Python** that can analyze large server log files efficiently, handle corrupted/malformed logs safely, generate reports, and display results in a **Flask-based interactive dashboard with charts**.
 
-## Features
-- Line-by-line processing (memory efficient)
-- Handles malformed log lines safely
-- Generates JSON + CSV reports
-- Saves cleaned valid logs
+This project demonstrates real-world concepts like:
+- File Operations (large file handling)
+- Exception Handling
+- Context Managers
+- Logging & Debugging
+- Report Generation (JSON + CSV)
+- Web Dashboard using Flask + Chart.js
 
-## Run
-```powershell
-python run.py --input data/raw_logs/sample.log
+---
+
+## 🚀 Project Highlights
+
+### ✅ Core Features
+- Reads huge log files **line-by-line** (memory efficient)
+- Extracts log details:
+  - IP Address
+  - Timestamp
+  - HTTP Method
+  - Endpoint
+  - Status Code
+  - Response Size
+- Calculates:
+  - Total Requests
+  - Total Bytes
+  - Status Code Counts
+  - Top Endpoints
+  - Top IPs
+  - Server Errors (>= 500)
+- Handles corrupted/malformed logs safely (no crash)
+
+### 🛡️ Error Handling
+- Custom exception: `InvalidLogLineError`
+- Invalid lines are stored in JSON report with:
+  - line number
+  - error message
+  - preview of invalid line
+
+### 📁 Reports Generated
+- `summary_report.json` → overall stats
+- `error_report.json` → invalid lines report
+- `status_code_report.csv` → status code frequency
+- `full_report.json` → everything combined in one file
+- `cleaned_logs.log` → only valid log lines
+
+### 🌐 Flask Website Dashboard
+- Upload `.log` file from browser
+- Visual dashboard with:
+  - Summary cards
+  - Status code charts (Bar + Pie)
+  - Top endpoints chart
+  - Top IPs chart
+  - Errors table
+  - Cleaned logs preview
+- Download reports directly
+- Upload history (stores old reports)
+
+---
+
+## 🧠 Problem Statement
+
+A startup’s web server generates massive log files (GBs). They need to analyze them but:
+- Files are huge → cannot load into memory
+- Some logs are corrupted → analysis should not crash
+- Need accurate statistics and reports
+- Need visualization/dashboard for monitoring
+
+This project solves all these problems.
+
+---
+
+## 📝 Log Format Supported
+
+Example log line (Apache/Nginx style):
+
