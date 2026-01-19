@@ -1,0 +1,4 @@
+{
+  "default_input_log": "data/raw_logs/sample.log",
+  "default_report_dir": "data/reports"
+}

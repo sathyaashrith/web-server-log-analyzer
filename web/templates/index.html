@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Web Server Log Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Web Server Log Analyzer</h1>
+    <p class="subtitle">Upload a server log file and generate reports + visual dashboard.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert">
+          {% for msg in messages %}
+            <p>{{ msg }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="card">
+      <h2>Upload Log File</h2>
+      <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="logfile" accept=".log,.txt" required />
+        <button type="submit">Analyze</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Upload History</h2>
+      {% if history_files and history_files|length > 0 %}
+        <p>Click any report to view old results:</p>
+        <ul class="history-list">
+          {% for file in history_files %}
+            <li>
+              <a href="/history/view/{{ file }}">{{ file }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No history available yet.</p>
+      {% endif %}
+    </div>
+
+    <footer>
+      <p>Built using Flask + Python Log Analyzer</p>
+    </footer>
+  </div>
+</body>
+</html>

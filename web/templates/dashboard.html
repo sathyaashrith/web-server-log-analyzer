@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Log Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header-row">
+      <h1>📈 Analysis Dashboard</h1>
+
+      <!-- Dark Mode Toggle -->
+      <button class="btn toggle-btn" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+    </div>
+
+    <div class="top-links">
+      <a class="btn" href="/">⬅ Upload Page</a>
+      <a class="btn" href="/history">📂 View History</a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid">
+      <div class="stat-card">
+        <h3>Total Requests</h3>
+        <p>{{ report.stats.total_requests or 0 }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Bytes</h3>
+        <p>{{ report.stats.total_bytes or 0 }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Server Errors (500+)</h3>
+        <p>{{ report.stats.server_errors or 0 }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Invalid Lines</h3>
+        <p>{{ report.stats.invalid_lines or 0 }}</p>
+      </div>
+    </div>
+
+    <!-- Charts in 2 Columns -->
+    <div class="chart-grid">
+      <div class="card">
+        <h2>Status Codes (Bar Chart)</h2>
+        <div class="chart-box">
+          <canvas id="statusBarChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Status Codes (Pie Chart)</h2>
+        <div class="chart-box">
+          <canvas id="statusPieChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Top Endpoints</h2>
+        <div class="chart-box">
+          <canvas id="endpointChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Top IPs</h2>
+        <div class="chart-box">
+          <canvas id="ipChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Filters -->
+    <div class="card">
+      <h2>Error Filters</h2>
+      <div class="downloads">
+        <a class="btn" href="/dashboard/all">All</a>
+        <a class="btn" href="/dashboard/invalid">Invalid Lines</a>
+      </div>
+      <p class="small-note">
+        Note: 4xx/5xx are valid requests and shown in status charts. Invalid errors are shown in the table.
+      </p>
+    </div>
+
+    <!-- Search Errors -->
+    <div class="card">
+      <h2>Errors Table</h2>
+
+      <input
+        type="text"
+        id="errorSearch"
+        class="search-box"
+        placeholder="🔍 Search errors (line number / preview / message)..."
+        onkeyup="filterErrors()"
+      />
+
+      {% if report.filtered_errors and report.filtered_errors|length > 0 %}
+        <table id="errorsTable">
+          <thead>
+            <tr>
+              <th>Line No</th>
+              <th>Error</th>
+              <th>Preview</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for err in report.filtered_errors %}
+              <tr>
+                <td>{{ err.line_number }}</td>
+                <td>{{ err.error }}</td>
+                <td>{{ err.line_preview }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No errors found 🎉</p>
+      {% endif %}
+    </div>
+
+    <!-- Cleaned Logs Preview -->
+    <div class="card">
+      <h2>Cleaned Logs Preview (First 50 lines)</h2>
+      {% if report.cleaned_preview and report.cleaned_preview|length > 0 %}
+        <pre class="log-preview">{% for line in report.cleaned_preview %}{{ line }}{% endfor %}</pre>
+      {% else %}
+        <p>No cleaned logs available.</p>
+      {% endif %}
+    </div>
+
+    <!-- Downloads -->
+    <div class="card">
+      <h2>Download Reports</h2>
+      <div class="downloads">
+        <a class="btn" href="/download/summary_report.json">Summary JSON</a>
+        <a class="btn" href="/download/error_report.json">Errors JSON</a>
+        <a class="btn" href="/download/status_code_report.csv">Status CSV</a>
+        <a class="btn" href="/download/full_report.json">Full Report JSON</a>
+        <a class="btn" href="/download/cleaned_logs.log">Cleaned Logs</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // -------------------------------
+    // Dark Mode
+    // -------------------------------
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+    }
+
+    // Restore dark mode on refresh
+    window.onload = function() {
+      const saved = localStorage.getItem("darkMode");
+      if (saved === "true") {
+        document.body.classList.add("dark-mode");
+      }
+    }
+
+    // -------------------------------
+    // Search Filter for Errors Table
+    // -------------------------------
+    function filterErrors() {
+      const input = document.getElementById("errorSearch");
+      const filter = input.value.toLowerCase();
+      const table = document.getElementById("errorsTable");
+      const rows = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < rows.length; i++) {
+        const rowText = rows[i].innerText.toLowerCase();
+        rows[i].style.display = rowText.includes(filter) ? "" : "none";
+      }
+    }
+
+    // -------------------------------
+    // Charts
+    // -------------------------------
+    const statusData = {{ report.status_codes | tojson }};
+    const statusLabels = Object.keys(statusData);
+    const statusCounts = Object.values(statusData);
+
+    new Chart(document.getElementById("statusBarChart"), {
+      type: "bar",
+      data: {
+        labels: statusLabels,
+        datasets: [{
+          label: "Status Count",
+          data: statusCounts
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    new Chart(document.getElementById("statusPieChart"), {
+      type: "pie",
+      data: {
+        labels: statusLabels,
+        datasets: [{
+          label: "Status Count",
+          data: statusCounts
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    const endpoints = {{ report.top_endpoints | tojson }};
+    const endpointLabels = endpoints.map(x => x[0]);
+    const endpointCounts = endpoints.map(x => x[1]);
+
+    new Chart(document.getElementById("endpointChart"), {
+      type: "bar",
+      data: {
+        labels: endpointLabels,
+        datasets: [{
+          label: "Hits",
+          data: endpointCounts
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    const ips = {{ report.top_ips | tojson }};
+    const ipLabels = ips.map(x => x[0]);
+    const ipCounts = ips.map(x => x[1]);
+
+    new Chart(document.getElementById("ipChart"), {
+      type: "bar",
+      data: {
+        labels: ipLabels,
+        datasets: [{
+          label: "Requests",
+          data: ipCounts
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  </script>
+</body>
+</html>
